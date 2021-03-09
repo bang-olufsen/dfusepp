@@ -2,6 +2,7 @@
 
 [![build](https://github.com/bang-olufsen/dfusepp/actions/workflows/build.yml/badge.svg)](https://github.com/bang-olufsen/dfusepp/actions/workflows/build.yml)
 [![coverage](https://coveralls.io/repos/github/bang-olufsen/dfusepp/badge.svg?branch=main)](https://coveralls.io/github/bang-olufsen/dfusepp?branch=main)
+[![lgtm](https://img.shields.io/lgtm/alerts/g/bang-olufsen/dfusepp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/bang-olufsen/dfusepp/alerts/)
 [![license](https://img.shields.io/badge/license-MIT_License-blue.svg?style=flat)](LICENSE)
 
 A C++11 header-only library for validating [DfuSe](http://rc.fdr.hu/UM0391.pdf) files on embedded devices.
