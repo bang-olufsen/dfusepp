@@ -180,9 +180,9 @@ private:
     {
         uint32_t crc;
 
-        for (uint16_t i = 0; i < m_crcTable.size(); i++) {
+        for (uint32_t i = 0; i < m_crcTable.size(); i++) {
             crc = i;
-            for (uint16_t j = 8; j > 0; j--) {
+            for (uint8_t j = 8; j > 0; j--) {
                 (crc & 1) ? crc = (crc >> 1) ^ 0xedb88320 : crc >>= 1;
                 m_crcTable[i] = crc;
             }
