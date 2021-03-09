@@ -24,12 +24,13 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
 // See http://rc.fdr.hu/UM0391.pdf for more details
 
 namespace Dfusepp {
 
-struct DfusePrefix {
+struct DfuseppPrefix {
     union {
         struct __attribute__((packed)) {
             std::array<char, 5> m_signature;
@@ -41,7 +42,7 @@ struct DfusePrefix {
     };
 };
 
-struct DfuseTargetPrefix {
+struct DfuseppTargetPrefix {
     union {
         struct __attribute__((packed)) {
             std::array<char, 6> m_signature;
@@ -55,7 +56,7 @@ struct DfuseTargetPrefix {
     };
 };
 
-struct DfuseImageElement {
+struct DfuseppImageElement {
     union {
         struct __attribute__((packed)) {
             uint32_t m_address;
@@ -66,7 +67,7 @@ struct DfuseImageElement {
     uint32_t m_offset;
 };
 
-struct DfuseSuffix {
+struct DfuseppSuffix {
     union {
         struct __attribute__((packed)) {
             uint16_t m_version;
@@ -97,32 +98,32 @@ public:
     bool addData(const uint8_t* data, uint32_t offset, size_t size)
     {
         for (size_t index = offset; index < (offset + size); ++index) {
-            if (index < sizeof(DfusePrefix::m_data)) {
+            if (index < sizeof(DfuseppPrefix::m_data)) {
                 m_prefix.m_data[index] = data[index - offset];
-            } else if (m_targetPrefixIndex < sizeof(DfuseTargetPrefix::m_data)) {
+            } else if (m_targetPrefixIndex < sizeof(DfuseppTargetPrefix::m_data)) {
                 m_targetPrefix.m_data[m_targetPrefixIndex] = data[index - offset];
                 m_targetPrefixIndex++;
             } else if (m_imageElements.size() < m_targetPrefix.Value.m_elements) {
                 if (!m_imageElementIndex)
                     m_imageElement.m_offset = index;
 
-                if (m_imageElementIndex < sizeof(DfuseImageElement::m_data)) {
+                if (m_imageElementIndex < sizeof(DfuseppImageElement::m_data)) {
                     m_imageElement.m_data[m_imageElementIndex] = data[index - offset];
                     m_imageElementIndex++;
-                } else if (m_imageElementIndex == (sizeof(DfuseImageElement::m_data) + m_imageElement.Value.m_size - 1)) {
+                } else if (m_imageElementIndex == (sizeof(DfuseppImageElement::m_data) + m_imageElement.Value.m_size - 1)) {
                     m_imageElements.push_back(m_imageElement);
                     std::fill(m_imageElement.m_data.begin(), m_imageElement.m_data.end(), 0);
                     m_imageElementIndex = 0;
                 } else
                     m_imageElementIndex++;
-            } else if (m_suffixIndex < sizeof(DfuseSuffix::m_data)) {
+            } else if (m_suffixIndex < sizeof(DfuseppSuffix::m_data)) {
                 m_suffix.m_data[m_suffixIndex] = data[index - offset];
                 m_suffixIndex++;
             } else
                 return false;
 
             // The CRC field should not be part of the CRC calculation
-            if (m_suffixIndex <= (sizeof(DfuseSuffix) - sizeof(uint32_t)))
+            if (m_suffixIndex <= (sizeof(DfuseppSuffix) - sizeof(uint32_t)))
                 m_crc = calculateCrc(m_crc, data[index - offset]);
         }
 
@@ -165,8 +166,8 @@ public:
     }
 
     //! Returns the detected images
-    //! @return A std::vector with DfuseImageElement's
-    std::vector<DfuseImageElement> images() const
+    //! @return A std::vector with DfuseppImageElement's
+    std::vector<DfuseppImageElement> images() const
     {
         return m_imageElements;
     }
@@ -196,11 +197,11 @@ private:
     std::array<char, 5> s_prefixSignature = { 'D', 'f', 'u', 'S', 'e' };
     std::array<char, 3> s_suffixSignature = { 'U', 'F', 'D' };
 
-    DfusePrefix m_prefix;
-    DfuseTargetPrefix m_targetPrefix;
-    DfuseSuffix m_suffix;
-    std::vector<DfuseImageElement> m_imageElements;
-    DfuseImageElement m_imageElement;
+    DfuseppPrefix m_prefix;
+    DfuseppTargetPrefix m_targetPrefix;
+    DfuseppSuffix m_suffix;
+    std::vector<DfuseppImageElement> m_imageElements;
+    DfuseppImageElement m_imageElement;
     std::array<uint32_t, 256> m_crcTable;
     uint32_t m_imageElementIndex { 0 };
     uint32_t m_targetPrefixIndex { 0 };
