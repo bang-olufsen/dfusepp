@@ -194,8 +194,8 @@ private:
         return ((crc >> 8) & 0x00FFFFFF) ^ m_crcTable[(crc ^ value) & 0xFF];
     }
 
-    std::array<char, 5> s_prefixSignature = { 'D', 'f', 'u', 'S', 'e' };
-    std::array<char, 3> s_suffixSignature = { 'U', 'F', 'D' };
+    const std::array<char, 5> s_prefixSignature = { 'D', 'f', 'u', 'S', 'e' };
+    const std::array<char, 3> s_suffixSignature = { 'U', 'F', 'D' };
 
     DfuseppPrefix m_prefix;
     DfuseppTargetPrefix m_targetPrefix;
