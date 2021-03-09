@@ -13,6 +13,8 @@ This library is made for validating DfuSe files without having to save the compl
 Data is added to Dfusepp using the `addData` function. This function can be called multiple times e.g. when reading a file to limit the amount of RAM required. For more usage examples please see the [unit tests](https://github.com/bang-olufsen/dfusepp/blob/main/test/src/TestDfusepp.cpp).
 
 ```cpp
+#include <array>
+#include <vector>
 #include <Dfusepp.h>
 
 int main()

@@ -1,5 +1,8 @@
 extraction:
   cpp:
+    prepare:
+      packages: 
+        - cmake
     index:
       build_command:
         - mkdir -p .build; cd .build
