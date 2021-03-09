@@ -41,8 +41,11 @@ std::array<uint8_t, 329> dfuImage {
 
 TEST_CASE("Test Dfusepp")
 {
+    uint32_t firstChunk = 150;
     Dfusepp::Dfusepp dfusepp;
-    CHECK(dfusepp.addData(dfuImage.data(), 0, dfuImage.size()));
+
+    CHECK(dfusepp.addData(dfuImage.data(), 0, firstChunk));
+    CHECK(dfusepp.addData(dfuImage.data() + firstChunk, firstChunk, dfuImage.size() - firstChunk));
 
     SECTION("Check version function")
     {
@@ -71,7 +74,7 @@ TEST_CASE("Test Dfusepp")
 
     SECTION("Check images function")
     {
-        std::vector<Dfusepp::DfuseImageElement> images = dfusepp.images();
+        std::vector<Dfusepp::DfuseppImageElement> images = dfusepp.images();
         CHECK(images.size() == 2);
         CHECK(images.at(0).Value.m_address == 0x1a000000);
         CHECK(images.at(0).Value.m_size == (strlen("Hello") + 1));
