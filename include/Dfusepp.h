@@ -95,32 +95,32 @@ public:
     bool addData(const uint8_t* data, uint32_t offset, size_t size)
     {
         for (size_t index = offset; index < (offset + size); ++index) {
-            if (index < sizeof(Prefix::m_data)) {
+            if (index < sizeof(Prefix::Value)) {
                 m_prefix.m_data[index] = data[index - offset];
-            } else if (m_targetPrefixIndex < sizeof(TargetPrefix::m_data)) {
+            } else if (m_targetPrefixIndex < sizeof(TargetPrefix::Value)) {
                 m_targetPrefix.m_data[m_targetPrefixIndex] = data[index - offset];
                 m_targetPrefixIndex++;
             } else if (m_imageElements.size() < m_targetPrefix.Value.m_elements) {
                 if (!m_imageElementIndex)
                     m_imageElement.m_offset = index;
 
-                if (m_imageElementIndex < sizeof(ImageElement::m_data)) {
+                if (m_imageElementIndex < sizeof(ImageElement::Value)) {
                     m_imageElement.m_data[m_imageElementIndex] = data[index - offset];
                     m_imageElementIndex++;
-                } else if (m_imageElementIndex == (sizeof(ImageElement::m_data) + m_imageElement.Value.m_size - 1)) {
+                } else if (m_imageElementIndex == (sizeof(ImageElement::Value) + m_imageElement.Value.m_size - 1)) {
                     m_imageElements.push_back(m_imageElement);
                     std::fill(m_imageElement.m_data.begin(), m_imageElement.m_data.end(), 0);
                     m_imageElementIndex = 0;
                 } else
                     m_imageElementIndex++;
-            } else if (m_suffixIndex < sizeof(Suffix::m_data)) {
+            } else if (m_suffixIndex < sizeof(Suffix::Value)) {
                 m_suffix.m_data[m_suffixIndex] = data[index - offset];
                 m_suffixIndex++;
             } else
                 return false;
 
             // The CRC field should not be part of the CRC calculation
-            if (m_suffixIndex <= (sizeof(Suffix::m_data) - sizeof(uint32_t)))
+            if (m_suffixIndex <= (sizeof(Suffix::Value) - sizeof(uint32_t)))
                 m_crc = calculateCrc(m_crc, data[index - offset]);
         }
 
