@@ -74,7 +74,7 @@ TEST_CASE("Test Dfusepp")
 
     SECTION("Check images function")
     {
-        std::vector<Dfusepp::DfuseppImageElement> images = dfusepp.images();
+        std::vector<Dfusepp::ImageElement> images = dfusepp.images();
         CHECK(images.size() == 2);
         CHECK(images.at(0).Value.m_address == 0x1a000000);
         CHECK(images.at(0).Value.m_size == (strlen("Hello") + 1));

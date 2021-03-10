@@ -25,12 +25,13 @@
 #include <array>
 #include <string>
 #include <vector>
+#include "Crc.h"
 
 // See http://rc.fdr.hu/UM0391.pdf for more details
 
 namespace Dfusepp {
 
-struct DfuseppPrefix {
+struct Prefix {
     union {
         struct __attribute__((packed)) {
             std::array<char, 5> m_signature;
@@ -42,7 +43,7 @@ struct DfuseppPrefix {
     };
 };
 
-struct DfuseppTargetPrefix {
+struct TargetPrefix {
     union {
         struct __attribute__((packed)) {
             std::array<char, 6> m_signature;
@@ -56,7 +57,7 @@ struct DfuseppTargetPrefix {
     };
 };
 
-struct DfuseppImageElement {
+struct ImageElement {
     union {
         struct __attribute__((packed)) {
             uint32_t m_address;
@@ -67,7 +68,7 @@ struct DfuseppImageElement {
     uint32_t m_offset;
 };
 
-struct DfuseppSuffix {
+struct Suffix {
     union {
         struct __attribute__((packed)) {
             uint16_t m_version;
@@ -84,11 +85,7 @@ struct DfuseppSuffix {
 
 class Dfusepp {
 public:
-    //! @brief Constructs the instance
-    Dfusepp()
-    {
-        generateCrcTable();
-    }
+    Dfusepp() = default;
 
     //! @brief Adds data to be processed
     //! @param data The data buffer to be added
@@ -98,32 +95,32 @@ public:
     bool addData(const uint8_t* data, uint32_t offset, size_t size)
     {
         for (size_t index = offset; index < (offset + size); ++index) {
-            if (index < sizeof(DfuseppPrefix::m_data)) {
+            if (index < sizeof(Prefix::m_data)) {
                 m_prefix.m_data[index] = data[index - offset];
-            } else if (m_targetPrefixIndex < sizeof(DfuseppTargetPrefix::m_data)) {
+            } else if (m_targetPrefixIndex < sizeof(TargetPrefix::m_data)) {
                 m_targetPrefix.m_data[m_targetPrefixIndex] = data[index - offset];
                 m_targetPrefixIndex++;
             } else if (m_imageElements.size() < m_targetPrefix.Value.m_elements) {
                 if (!m_imageElementIndex)
                     m_imageElement.m_offset = index;
 
-                if (m_imageElementIndex < sizeof(DfuseppImageElement::m_data)) {
+                if (m_imageElementIndex < sizeof(ImageElement::m_data)) {
                     m_imageElement.m_data[m_imageElementIndex] = data[index - offset];
                     m_imageElementIndex++;
-                } else if (m_imageElementIndex == (sizeof(DfuseppImageElement::m_data) + m_imageElement.Value.m_size - 1)) {
+                } else if (m_imageElementIndex == (sizeof(ImageElement::m_data) + m_imageElement.Value.m_size - 1)) {
                     m_imageElements.push_back(m_imageElement);
                     std::fill(m_imageElement.m_data.begin(), m_imageElement.m_data.end(), 0);
                     m_imageElementIndex = 0;
                 } else
                     m_imageElementIndex++;
-            } else if (m_suffixIndex < sizeof(DfuseppSuffix::m_data)) {
+            } else if (m_suffixIndex < sizeof(Suffix::m_data)) {
                 m_suffix.m_data[m_suffixIndex] = data[index - offset];
                 m_suffixIndex++;
             } else
                 return false;
 
             // The CRC field should not be part of the CRC calculation
-            if (m_suffixIndex <= (sizeof(DfuseppSuffix) - sizeof(uint32_t)))
+            if (m_suffixIndex <= (sizeof(Suffix::m_data) - sizeof(uint32_t)))
                 m_crc = calculateCrc(m_crc, data[index - offset]);
         }
 
@@ -166,43 +163,20 @@ public:
     }
 
     //! Returns the detected images
-    //! @return A std::vector with DfuseppImageElement's
-    std::vector<DfuseppImageElement> images() const
+    //! @return A std::vector with ImageElement's
+    std::vector<ImageElement> images() const
     {
         return m_imageElements;
     }
 
-    //! @brief Destructs the instance
-    virtual ~Dfusepp() = default;
-
 private:
-    void generateCrcTable()
-    {
-        uint32_t crc;
-
-        for (uint32_t i = 0; i < m_crcTable.size(); i++) {
-            crc = i;
-            for (uint8_t j = 8; j > 0; j--) {
-                (crc & 1) ? crc = (crc >> 1) ^ 0xedb88320 : crc >>= 1;
-                m_crcTable[i] = crc;
-            }
-        }
-    }
-
-    uint32_t calculateCrc(uint32_t crc, uint32_t value)
-    {
-        return ((crc >> 8) & 0x00FFFFFF) ^ m_crcTable[(crc ^ value) & 0xFF];
-    }
-
     static constexpr std::array<char, 5> s_prefixSignature = { 'D', 'f', 'u', 'S', 'e' };
     static constexpr std::array<char, 3> s_suffixSignature = { 'U', 'F', 'D' };
-
-    DfuseppPrefix m_prefix;
-    DfuseppTargetPrefix m_targetPrefix;
-    DfuseppSuffix m_suffix;
-    std::vector<DfuseppImageElement> m_imageElements;
-    DfuseppImageElement m_imageElement;
-    std::array<uint32_t, 256> m_crcTable;
+    Prefix m_prefix;
+    TargetPrefix m_targetPrefix;
+    Suffix m_suffix;
+    std::vector<ImageElement> m_imageElements;
+    ImageElement m_imageElement;
     uint32_t m_imageElementIndex { 0 };
     uint32_t m_targetPrefixIndex { 0 };
     uint32_t m_suffixIndex { 0 };

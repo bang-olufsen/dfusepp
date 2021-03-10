@@ -25,8 +25,13 @@ int main()
 
     dfusepp.addData(dfuImage.data(), 0, dfuImage.size());
     if (dfusepp.valid()) {
-        std::vector<Dfusepp::DfuseppImageElement> images = dfusepp.images();
+        std::vector<Dfusepp::ImageElement> images = dfusepp.images();
         ...
     }
 }
 ```
+
+## Limitations
+
+* Only support a single image with multiple image elements
+* Only support little endian targets due to current unions used
