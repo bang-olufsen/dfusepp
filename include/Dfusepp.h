@@ -102,7 +102,7 @@ public:
                 m_targetPrefixIndex++;
             } else if (m_imageElements.size() < m_targetPrefix.Value.m_elements) {
                 if (!m_imageElementIndex)
-                    m_imageElement.m_offset = index;
+                    m_imageElement.m_offset = index + sizeof(ImageElement::Value);
 
                 if (m_imageElementIndex < sizeof(ImageElement::Value)) {
                     m_imageElement.m_data[m_imageElementIndex] = data[index - offset];

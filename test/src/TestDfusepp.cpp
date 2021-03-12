@@ -78,9 +78,9 @@ TEST_CASE("Test Dfusepp")
         CHECK(images.size() == 2);
         CHECK(images.at(0).Value.m_address == 0x1a000000);
         CHECK(images.at(0).Value.m_size == (strlen("Hello") + 1));
-        CHECK(images.at(0).m_offset == 285);
+        CHECK(images.at(0).m_offset == 293);
         CHECK(images.at(1).Value.m_address == 0x1a010000);
         CHECK(images.at(1).Value.m_size == (strlen("World") + 1));
-        CHECK(images.at(1).m_offset == 299);
+        CHECK(images.at(1).m_offset == 307);
     }
 }
