@@ -129,35 +129,35 @@ public:
 
     //! Returns the version
     //! @return A uint16_t with the version
-    uint16_t version()
+    uint16_t version() const
     {
         return m_suffix.Value.m_version;
     }
 
     //! Returns the product ID
     //! @return A uint16_t with the product ID
-    uint16_t productId()
+    uint16_t productId() const
     {
         return m_suffix.Value.m_productId;
     }
 
     //! Returns the vendor ID
     //! @return A uint16_t with the vendor ID
-    uint16_t vendorId()
+    uint16_t vendorId() const
     {
         return m_suffix.Value.m_vendorId;
     }
 
     //! Returns if the DfuSe file is valid
     //! @return A bool with the result
-    bool valid()
+    bool valid() const
     {
         return ((m_prefix.Value.m_signature == s_prefixSignature) && (m_suffix.Value.m_signature == s_suffixSignature) && (m_crc == m_suffix.Value.m_crc));
     }
 
     //! Returns the detected target name
     //! @return A std::string with the target name
-    std::string targetName()
+    std::string targetName() const
     {
         return std::string(m_targetPrefix.Value.m_targetName.data());
     }
@@ -167,6 +167,12 @@ public:
     std::vector<ImageElement> images() const
     {
         return m_imageElements;
+    }
+
+    //! Returns the total image size in bytes
+    size_t size() const
+    {
+        return m_prefix.Value.m_dfuImageSize + sizeof(Suffix::Value);
     }
 
 private:

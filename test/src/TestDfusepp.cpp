@@ -83,4 +83,9 @@ TEST_CASE("Test Dfusepp")
         CHECK(images.at(1).Value.m_size == (strlen("World") + 1));
         CHECK(images.at(1).m_offset == 307);
     }
+
+    SECTION("Check size function")
+    {
+        CHECK(dfusepp.size() == dfuImage.size());
+    }
 }
