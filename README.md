@@ -9,6 +9,8 @@ A C++11 header-only library for validating [DfuSe](http://rc.fdr.hu/UM0391.pdf) 
 
 This library is made for validating DfuSe files without having to save the complete image in RAM. Instead only the offsets to the images are saved for easier extract and copy to e.g. Flash. DfuSe images can be generated using [dfuse-tool](https://github.com/bang-olufsen/dfuse-tool).
 
+By defining `DFUSEPP_IMAGE_ELEMENT_VERSION` it is possible to attach a 4 byte version header (1 byte major, 1 byte minor and 2 bytes patch version) to the image elements. This can be useful if several images are to be included and you want to be able to readout the version and save the additional overhead of the 274 bytes Target Prefix per image. The [dfuse-tool](https://github.com/bang-olufsen/dfuse-tool) also only works with a single DFU image with several image elements.
+
 ## Usage
 
 Data is added to Dfusepp using the `addData` function. This function can be called multiple times e.g. when reading a file to limit the amount of RAM required. For more usage examples please see the [unit tests](https://github.com/bang-olufsen/dfusepp/blob/main/test/src/TestDfusepp.cpp).

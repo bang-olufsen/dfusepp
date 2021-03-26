@@ -62,8 +62,17 @@ struct ImageElement {
         struct __attribute__((packed)) {
             uint32_t m_address;
             uint32_t m_size;
+#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
+            uint8_t m_versionMajor;
+            uint8_t m_versionMinor;
+            uint16_t m_versionPatch;
+#endif
         } Value;
+#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
+        std::array<uint8_t, 12> m_data {};
+#else
         std::array<uint8_t, 8> m_data {};
+#endif
     };
     uint32_t m_offset;
 };
@@ -148,11 +157,18 @@ public:
         return m_suffix.Value.m_vendorId;
     }
 
+    //! Returns if the DfuSe file has a valid prefix
+    //! @return A bool with the result
+    bool prefixValid() const
+    {
+        return m_prefix.Value.m_signature == s_prefixSignature;
+    }
+
     //! Returns if the DfuSe file is valid
     //! @return A bool with the result
     bool valid() const
     {
-        return ((m_prefix.Value.m_signature == s_prefixSignature) && (m_suffix.Value.m_signature == s_suffixSignature) && (m_crc == m_suffix.Value.m_crc));
+        return (prefixValid() && (m_suffix.Value.m_signature == s_suffixSignature) && (m_crc == m_suffix.Value.m_crc));
     }
 
     //! Returns the detected target name
