@@ -27,6 +27,12 @@
 #include <vector>
 #include "Crc.h"
 
+#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
+#define DFUSEPP_IMAGE_ELEMENT_VERSION_SIZE 4
+#else
+#define DFUSEPP_IMAGE_ELEMENT_VERSION_SIZE 0
+#endif
+
 // See http://rc.fdr.hu/UM0391.pdf for more details
 
 namespace Dfusepp {
@@ -68,11 +74,7 @@ struct ImageElement {
             uint16_t m_versionPatch;
 #endif
         } Value;
-#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
-        std::array<uint8_t, 12> m_data {};
-#else
-        std::array<uint8_t, 8> m_data {};
-#endif
+        std::array<uint8_t, 8 + DFUSEPP_IMAGE_ELEMENT_VERSION_SIZE> m_data {};
     };
     uint32_t m_offset;
 };
@@ -116,6 +118,10 @@ public:
                 if (m_imageElementIndex < sizeof(ImageElement::Value)) {
                     m_imageElement.m_data[m_imageElementIndex] = data[index - offset];
                     m_imageElementIndex++;
+#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
+                    if (m_imageElementIndex == (sizeof(ImageElement::Value) - 1))
+                        m_imageElement.Value.m_size -= DFUSEPP_IMAGE_ELEMENT_VERSION_SIZE;
+#endif
                 } else if (m_imageElementIndex == (sizeof(ImageElement::Value) + m_imageElement.Value.m_size - 1)) {
                     m_imageElements.push_back(m_imageElement);
                     std::fill(m_imageElement.m_data.begin(), m_imageElement.m_data.end(), 0);
