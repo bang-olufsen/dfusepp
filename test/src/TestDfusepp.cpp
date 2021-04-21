@@ -81,12 +81,12 @@ TEST_CASE("Test Dfusepp")
     {
         std::vector<Dfusepp::ImageElement> images = dfusepp.images();
         CHECK(images.size() == 2);
-        CHECK(images.at(0).Value.m_address == 0x1a000000);
-        CHECK(images.at(0).Value.m_size == (strlen("Hello") + 1));
-        CHECK(images.at(0).m_offset == 293);
-        CHECK(images.at(1).Value.m_address == 0x1a010000);
-        CHECK(images.at(1).Value.m_size == (strlen("World") + 1));
-        CHECK(images.at(1).m_offset == 307);
+        CHECK(images.at(0).Value.address == 0x1a000000);
+        CHECK(images.at(0).Value.size == (strlen("Hello") + 1));
+        CHECK(images.at(0).offset == 293);
+        CHECK(images.at(1).Value.address == 0x1a010000);
+        CHECK(images.at(1).Value.size == (strlen("World") + 1));
+        CHECK(images.at(1).offset == 307);
     }
 
     SECTION("Check size function")
