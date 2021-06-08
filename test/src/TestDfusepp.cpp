@@ -62,11 +62,6 @@ TEST_CASE("Test Dfusepp")
         CHECK(dfusepp.vendorId() == 0x0483);
     }
 
-    SECTION("Check prefixValid function")
-    {
-        CHECK(dfusepp.prefixValid());
-    }
-
     SECTION("Check valid function")
     {
         CHECK(dfusepp.valid());

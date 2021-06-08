@@ -22,14 +22,14 @@
 
 #pragma once
 
+#include "Crc.h"
 #include <array>
 #include <string>
 #include <vector>
-#include "Crc.h"
 
 // See http://rc.fdr.hu/UM0391.pdf for more details
 
-#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
+#if defined(DFUSEPP_IMAGE_ELEMENT_VERSION)
 #define DFUSEPP_IMAGE_ELEMENT_VERSION_SIZE 4
 #else
 #define DFUSEPP_IMAGE_ELEMENT_VERSION_SIZE 0
@@ -68,7 +68,7 @@ struct ImageElement {
         struct __attribute__((packed)) {
             uint32_t address;
             uint32_t size;
-#if defined (DFUSEPP_IMAGE_ELEMENT_VERSION)
+#if defined(DFUSEPP_IMAGE_ELEMENT_VERSION)
             uint8_t versionMajor;
             uint8_t versionMinor;
             uint16_t versionPatch;
@@ -97,13 +97,14 @@ struct Suffix {
 class Dfusepp {
 public:
     Dfusepp() = default;
+    virtual ~Dfusepp() = default;
 
-    //! @brief Adds data to be processed
-    //! @param data The data buffer to be added
-    //! @param offset The offset to add the data at
-    //! @param size The size of the data to be added
-    //! @return A bool with the result
-    bool addData(const uint8_t* data, uint32_t offset, size_t size)
+    /// @brief Adds data to be processed
+    /// @param data The data buffer to be added
+    /// @param offset The offset to add the data at
+    /// @param size The size of the data to be added
+    /// @return A bool with the result
+    virtual bool addData(const uint8_t* data, uint32_t offset, size_t size)
     {
         for (size_t index = offset; index < (offset + size); ++index) {
             if (index < sizeof(Prefix::Value)) {
@@ -140,57 +141,50 @@ public:
         return true;
     }
 
-    //! Returns the version
-    //! @return A uint16_t with the version
-    uint16_t version() const
+    /// Returns the version
+    /// @return A uint16_t with the version
+    virtual uint16_t version() const
     {
         return m_suffix.Value.version;
     }
 
-    //! Returns the product ID
-    //! @return A uint16_t with the product ID
-    uint16_t productId() const
+    /// Returns the product ID
+    /// @return A uint16_t with the product ID
+    virtual uint16_t productId() const
     {
         return m_suffix.Value.productId;
     }
 
-    //! Returns the vendor ID
-    //! @return A uint16_t with the vendor ID
-    uint16_t vendorId() const
+    /// Returns the vendor ID
+    /// @return A uint16_t with the vendor ID
+    virtual uint16_t vendorId() const
     {
         return m_suffix.Value.vendorId;
     }
 
-    //! Returns if the DfuSe file has a valid m_prefix
-    //! @return A bool with the result
-    bool prefixValid() const
+    /// Returns if the DfuSe file is valid
+    /// @return A bool with the result
+    virtual bool valid() const
     {
-        return m_prefix.Value.signature == s_prefixSignature;
+        return ((m_prefix.Value.signature == s_prefixSignature) && (m_suffix.Value.signature == s_suffixSignature) && (m_crc == m_suffix.Value.crc));
     }
 
-    //! Returns if the DfuSe file is valid
-    //! @return A bool with the result
-    bool valid() const
-    {
-        return (prefixValid() && (m_suffix.Value.signature == s_suffixSignature) && (m_crc == m_suffix.Value.crc));
-    }
-
-    //! Returns the detected target name
-    //! @return A std::string with the target name
-    std::string targetName() const
+    /// Returns the detected target name
+    /// @return A std::string with the target name
+    virtual std::string targetName() const
     {
         return std::string(m_targetPrefix.Value.targetName.data());
     }
 
-    //! Returns the detected images
-    //! @return A std::vector with ImageElement's
-    std::vector<ImageElement> images() const
+    /// Returns the detected images
+    /// @return A std::vector with ImageElement's
+    virtual std::vector<ImageElement> images() const
     {
         return m_imageElements;
     }
 
-    //! Returns the total image size in bytes
-    size_t size() const
+    /// Returns the total image size in bytes
+    virtual size_t size() const
     {
         return m_prefix.Value.dfuImageSize + sizeof(Suffix::Value);
     }
