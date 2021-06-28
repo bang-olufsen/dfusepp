@@ -184,6 +184,7 @@ public:
     }
 
     /// Returns the total image size in bytes
+    /// @return A size_t with the size
     virtual size_t size() const
     {
         return m_prefix.Value.dfuImageSize + sizeof(Suffix::Value);
