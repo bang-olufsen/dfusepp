@@ -162,11 +162,18 @@ public:
         return m_suffix.Value.vendorId;
     }
 
+    /// Returns if the DfuSe prefix is valid
+    /// @return A bool with the result
+    virtual bool prefixValid() const
+    {
+        return m_prefix.Value.signature == s_prefixSignature;
+    }
+
     /// Returns if the DfuSe file is valid
     /// @return A bool with the result
     virtual bool valid() const
     {
-        return ((m_prefix.Value.signature == s_prefixSignature) && (m_suffix.Value.signature == s_suffixSignature) && (m_crc == m_suffix.Value.crc));
+        return (prefixValid() && (m_suffix.Value.signature == s_suffixSignature) && (m_crc == m_suffix.Value.crc));
     }
 
     /// Returns the detected target name
