@@ -39,10 +39,25 @@ std::array<uint8_t, 329> dfuImage {
     0x10, 0x0d, 0xd7, 0xac, 0x66
 };
 
-TEST_CASE("Test Dfusepp")
+TEST_CASE("Test Dfusepp with invalid image")
 {
-    uint32_t firstChunk = 150;
     Dfusepp::Dfusepp dfusepp;
+    auto dfuImageInvalid = dfuImage;
+    // Invalidate the image by lower casing the first letter
+    dfuImageInvalid.at(293) = 'h';
+
+    CHECK(dfusepp.addData(dfuImageInvalid.data(), 0, dfuImageInvalid.size()));
+
+    SECTION("Check valid function")
+    {
+        CHECK_FALSE(dfusepp.valid());
+    }
+}
+
+TEST_CASE("Test Dfusepp with valid image")
+{
+    Dfusepp::Dfusepp dfusepp;
+    uint32_t firstChunk = 150;
 
     CHECK(dfusepp.addData(dfuImage.data(), 0, firstChunk));
     CHECK(dfusepp.addData(dfuImage.data() + firstChunk, firstChunk, dfuImage.size() - firstChunk));
@@ -67,7 +82,7 @@ TEST_CASE("Test Dfusepp")
         CHECK(dfusepp.valid());
     }
 
-    SECTION("Check valid function")
+    SECTION("Check targetName function")
     {
         CHECK(dfusepp.targetName() == "ST...");
     }
